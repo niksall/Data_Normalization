@@ -20,7 +20,7 @@ DECLARE @status_id INT, @inprogress BIT, @lastupdate DATETIME
      WHERE m.deleted IS NULL
 
 	--status populate
-	EXEC pk5.err_fix_status_progress @status_id, 0, NULL, 0, 0, @total, N'обрабатывается', 0, NULL, @user
+	EXEC pk5.err_fix_status_progress @status_id, 0, NULL, 0, 0, @total, N'processed', 0, NULL, @user
 
 	DECLARE @id INT
 
@@ -38,18 +38,17 @@ DECLARE @status_id INT, @inprogress BIT, @lastupdate DATETIME
     BEGIN
 		SET @i = @i + 1
 		SET @proc = @i*100/@total
-		SET @status = CONCAT(N'обрабатывается: ', @i, N' из ', @total)
+		SET @status = CONCAT(N'processed: ', @i, N' из ', @total)
 		--status progress
 		EXEC pk5.err_fix_status_progress @status_id, @cancel OUT, @lastupdate OUT, @proc, @i, @total, @status 
         IF (@cancel = 1)
 		BEGIN
 			SET @proc = @i*100/@total
 			--status complete
-		    EXEC pk5.err_fix_status_complete @status_id, @proc, @i, @total, N'остановлено пользователем'
+		    EXEC pk5.err_fix_status_complete @status_id, @proc, @i, @total, N'stopped by user'
 			RETURN 0;
 		END
 		
-		--EXEC pk5.err_models @id 
 		EXEC pk5.err_model_id_0 @id
 		EXEC pk5.err_model_descr_0 @id
 		EXEC pk5.err_model_code_0 @id
@@ -62,6 +61,6 @@ DECLARE @status_id INT, @inprogress BIT, @lastupdate DATETIME
     CLOSE cur
     DEALLOCATE cur
 
-	EXEC pk5.err_fix_status_complete @status_id, 100, @total, @total, N'завершено'
+	EXEC pk5.err_fix_status_complete @status_id, 100, @total, @total, N'completed'
 
 END
