@@ -2,7 +2,7 @@ CREATE PROCEDURE [pk5].[err_models] @id INT
 AS
 BEGIN
 
-	--Проверка наличия моделей без марок.
+	--Checking for models without brands.
 	INSERT INTO pk5.error (row_id, col, error, tbl, error_type, deleted, qty_code)
 	SELECT DISTINCT m.id, '', '', 'dbo.models', null, NULL, 153
 	FROM dbo.models m
@@ -10,7 +10,7 @@ BEGIN
 		WHERE mm.id IS NULL AND m.deleted IS NULL AND m.id = @id
 		GROUP BY m.site_code, m.id
 
-	--Проверка наличия моделей с одинаковым наименованием (с разными классами).
+	--Checking the availability of models with the same name (with different classes).
 	INSERT INTO pk5.error (row_id, col, error, tbl, error_type, deleted, qty_code)
 	SELECT DISTINCT m.id, '', '', 'dbo.models', null, NULL, 155
 	FROM dbo.models m JOIN 
@@ -23,7 +23,7 @@ BEGIN
 	) AS d_m ON d_m.site_code = m.site_code AND d_m.descr = m.descr
 	WHERE m.deleted IS NULL AND m.id = @id
 
-	--Проверка наличия моделей с одинаковым кодом (с разными наименованиями или классами).
+	--Checking for models with the same code (with different names or classes).
 	INSERT INTO pk5.error (row_id, col, error, tbl, error_type, deleted, qty_code)
 	SELECT DISTINCT m.id, '', '', 'dbo.models', null, NULL, 156
 	FROM dbo.models m JOIN 
@@ -36,7 +36,7 @@ BEGIN
 	) AS d_m ON d_m.site_code = m.site_code AND d_m.code = m.code
 	WHERE m.deleted IS NULL AND m.id = @id
 
-	--Модели нет в справочнике сгруппированных моделей
+	--Models are not in the directory of grouped models
 	INSERT INTO pk5.error (row_id, col, error, tbl, error_type, deleted, qty_code)
 	SELECT m.id, '', '', 'dbo.models', null, NULL, 158
 	FROM dbo.models m
